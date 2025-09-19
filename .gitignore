@@ -1,0 +1,60 @@
+# Backend (Spring Boot)
+backend/target/
+backend/.mvn/wrapper/maven-wrapper.jar
+backend/mvnw
+backend/mvnw.cmd
+*.log
+*.jar
+!**/src/main/**
+!**/src/test/**
+
+# Frontend (React)
+frontend/node_modules/
+frontend/build/
+frontend/.env.local
+frontend/.env.development.local
+frontend/.env.test.local
+frontend/.env.production.local
+frontend/npm-debug.log*
+frontend/yarn-debug.log*
+frontend/yarn-error.log*
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Docker
+.env
+
+# Logs
+logs
+*.log
+
+# Runtime data
+pids
+*.pid
+*.seed
+*.pid.lock
+
+# Coverage directory used by tools like istanbul
+coverage/
+
+# Database
+*.db
+*.sqlite
+
+# Temporary files
+*.tmp
+*.temp

@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Notification Bell Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .notification-bell { font-size: 24px; cursor: pointer; margin: 20px; }
+        .notifications { border: 1px solid #ccc; padding: 20px; max-width: 500px; }
+        .notification { padding: 10px; border-bottom: 1px solid #eee; }
+        .unread { background-color: #f0f8ff; }
+        button { padding: 10px 20px; margin: 10px; }
+    </style>
+</head>
+<body>
+    <h1>Notification Bell Demo - Test Page</h1>
+    
+    <div class="notification-bell" onclick="loadNotifications()">
+        🔔 <span id="unread-count">0</span>
+    </div>
+    
+    <div id="notifications" class="notifications">
+        <h3>Notifications</h3>
+        <div id="notification-list">Loading...</div>
+    </div>
+    
+    <button onclick="sendTestNotification()">Send Test Notification</button>
+    <button onclick="loadNotifications()">Refresh Notifications</button>
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/sockjs-client/1.6.1/sockjs.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
+    
+    <script>
+        let stompClient = null;
+        let notifications = [];
+        
+        // Connect to WebSocket
+        function connect() {
+            const socket = new SockJS('http://localhost:8080/ws');
+            stompClient = Stomp.over(socket);
+            
+            stompClient.connect({}, function (frame) {
+                console.log('Connected: ' + frame);
+                stompClient.subscribe('/topic/notifications/1', function (message) {
+                    const notification = JSON.parse(message.body);
+                    console.log('Received notification:', notification);
+                    notifications.unshift(notification);
+                    displayNotifications();
+                });
+            });
+        }
+        
+        // Load notifications from API
+        function loadNotifications() {
+            fetch('http://localhost:8080/api/notifications/1')
+                .then(response => response.json())
+                .then(data => {
+                    notifications = data;
+                    displayNotifications();
+                })
+                .catch(error => console.error('Error:', error));
+        }
+        
+        // Display notifications
+        function displayNotifications() {
+            const listElement = document.getElementById('notification-list');
+            const unreadCount = notifications.filter(n => !n.read).length;
+            document.getElementById('unread-count').textContent = unreadCount;
+            
+            listElement.innerHTML = notifications.map(notification => `
+                <div class="notification ${notification.read ? '' : 'unread'}">
+                    <strong>${notification.message}</strong><br>
+                    <small>${new Date(notification.createdAt).toLocaleString()}</small>
+                    ${notification.read ? '' : ' <strong>(NEW)</strong>'}
+                </div>
+            `).join('');
+        }
+        
+        // Send test notification
+        function sendTestNotification() {
+            const message = 'Test notification sent at ' + new Date().toLocaleTimeString();
+            fetch('http://localhost:8080/api/notifications/1', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'text/plain',
+                },
+                body: message
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log('Notification sent:', data);
+            })
+            .catch(error => console.error('Error:', error));
+        }
+        
+        // Initialize
+        connect();
+        loadNotifications();
+    </script>
+</body>
+</html>
