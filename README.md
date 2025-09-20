@@ -435,6 +435,55 @@ React-SpringSTOM-bell/
 - Implement notification preferences
 - Add real-time user presence
 
+
+
+
+<h2> 
+prompt used
+</h2>
+# Build a Notification Bell Demo with Spring Boot + React + Postgres + Docker
+
+I want you to generate a **full-stack demo** app with:
+
+## Backend (Spring Boot)
+- Spring Boot app (Java 21, Maven).
+- WebSocket with **STOMP** configured at `/ws`.
+- Topic: `/topic/notifications/{userId}`.
+- REST API:
+  - `GET /api/notifications/{userId}` → fetch historical notifications from DB.
+  - `POST /api/notifications/{userId}` with a request body containing message → create notification, store in Postgres, and push real-time via WebSocket.
+- Entity: `Notification(id, userId, message, read, createdAt)`.
+- Repository: JPA with Postgres.
+- Service: Save + publish notification via `SimpMessagingTemplate`.
+
+## Frontend (React)
+- React app with:
+  - A simple top navigation bar containing a **notification bell**.
+  - When bell is clicked, it shows **real-time + historical notifications** in a dropdown.
+  - A simple DataTable below with sample dummy rows (e.g., Task ID, Title, Status).
+- Use `@stomp/stompjs`, `sockjs-client`, and `axios`.
+- Custom hook `useNotifications(userId)` to handle WebSocket + REST fetch.
+
+## Database
+- Postgres with a `notifications` table.
+- Application should connect via environment variables.
+
+## Docker Compose
+- Define services:
+  - `backend` (Spring Boot, port 8080).
+  - `frontend` (React, port 3000).
+  - `db` (Postgres).
+- Make sure backend connects to Postgres service `db`.
+- Use Docker volumes for Postgres persistence.
+
+## Curl Command for Testing
+Provide a `curl` command to simulate task assignment and trigger notification:
+```bash
+curl -X POST "http://localhost:8080/api/notifications/1" \
+  -H "Content-Type: text/plain" \
+  -d "New task assigned to you!"
+
+
 ## 📝 License
 
 This project is for demonstration purposes.

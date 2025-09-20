@@ -31,8 +31,6 @@ services:
       - db
     networks:
       - app-network
-    volumes:
-      - ./backend:/app
     restart: unless-stopped
 
   frontend:
